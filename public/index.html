@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>서울 미세먼지 데이터 API 실습</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .data-container {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>서울 미세먼지 데이터 API 실습</h1>
+    <select id="station-select">
+        <option value="종로구">종로구</option>
+        <option value="중구">중구</option>
+        <option value="용산구">용산구</option>
+        <option value="성동구">성동구</option>
+        <option value="광진구">광진구</option>
+        <option value="동대문구">동대문구</option>
+        <option value="중랑구">중랑구</option>
+        <option value="성북구">성북구</option>
+        <option value="강북구">강북구</option>
+        <option value="도봉구">도봉구</option>
+        <option value="노원구">노원구</option>
+        <option value="은평구">은평구</option>
+        <option value="서대문구">서대문구</option>
+        <option value="마포구">마포구</option>
+        <option value="양천구">양천구</option>
+        <option value="강서구">강서구</option>
+        <option value="구로구">구로구</option>
+        <option value="금천구">금천구</option>
+        <option value="영등포구">영등포구</option>
+        <option value="동작구">동작구</option>
+        <option value="관악구">관악구</option>
+        <option value="서초구">서초구</option>
+        <option value="강남구">강남구</option>
+        <option value="송파구">송파구</option>
+        <option value="강동구">강동구</option>
+    </select>
+    <div id="data-container" class="data-container">
+        <table id="data-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Station</th>
+                    <th>미세먼지(PM10)</th>
+                    <th>초미세먼지(PM2.5)</th>
+                    <th>통합대기환경수치</th>
+                    <th>Data Time</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        // 데이터를 가져오는 함수
+        async function fetchData() {
+            const stationName = document.getElementById('station-select').value;
+            try {
+                const response = await fetch(`/air?stationName=${encodeURIComponent(stationName)}`);
+                const data = await response.json();
+                const dataTable = document.getElementById('data-table');
+                const tbody = dataTable.querySelector('tbody');
+                tbody.innerHTML = ''; // 기존 데이터 초기화
+
+                data.response.body.items.forEach(item => {
+                    const tr = document.createElement('tr');
+                    const stationTd = document.createElement('td');
+                    stationTd.textContent = item.stationName;
+                    const pm10Td = document.createElement('td');
+                    pm10Td.textContent = item.pm10Value;
+                    const pm25Td = document.createElement('td');
+                    pm25Td.textContent = item.pm25Value;
+                    const khaiValueTd = document.createElement('td');
+                    khaiValueTd.textContent = item.khaiValue;
+                    const dataTimeTd = document.createElement('td');
+                    dataTimeTd.textContent = item.dataTime;
+
+                    tr.appendChild(stationTd);
+                    tr.appendChild(pm10Td);
+                    tr.appendChild(pm25Td);
+                    tr.appendChild(khaiValueTd);
+                    tr.appendChild(dataTimeTd);
+                    tbody.appendChild(tr);
+                });
+
+                dataTable.style.display = 'table'; // 데이터가 있을 때만 테이블 표시
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // 페이지 로드 시 데이터를 가져옴
+        document.addEventListener('DOMContentLoaded', fetchData);
+
+        // 버튼 클릭 시 데이터를 가져옴
+        document.getElementById('station-select').addEventListener('click', fetchData);
+    </script>
+</body>
+<footer>
+    <h5>제작자:김홍경</h5>
+</footer>
+</html>
